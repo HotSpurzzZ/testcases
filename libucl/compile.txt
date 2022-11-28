@@ -1,0 +1,12 @@
+CC = clang
+CFLAGS = -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link
+LIB_FUZZING_ENGINE="-fsanitize=fuzzer"
+
+cd libucl 
+./autogen.sh && ./configure
+make
+
+$CC $CFLAGS $LIB_FUZZING_ENGINE tests/fuzzers/ucl_add_string_fuzzer.c \
+    -DHAVE_CONFIG_H -I./src -I./include src/.libs/libucl.a -I./ \
+    -o $OUT/ucl_add_string_fuzzer
+./ucl_add_string_fuzzer $poc
